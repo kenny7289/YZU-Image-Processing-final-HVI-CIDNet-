@@ -82,12 +82,26 @@ directory = "weights"
 pth_files = find_pth_files(directory)
 pth_files2 = remove_weights_prefix(pth_files)
 
+CLAUDE_NOTICE = (
+    "此 Demo 環境使用 Claude Code（Anthropic VS Code 擴充功能）參考官方 repo "
+    "Fediory/HVI-CIDNet 所建置與修改，用於個人研究論文實驗。"
+)
+
+USAGE_GUIDE = """
+### 使用說明
+1. 上傳一張低光照（low-light）圖片。
+2. 在「Model Weights」選擇權重檔，建議使用 `generalization.pth`（泛化能力最佳）。
+3. 可調整 `gamma curve`、`Alpha-s`、`Alpha-i` 滑桿來控制亮度、飽和度與整體增強強度。
+4. 「Image Score」選 `Yes` 可額外計算 NIQE / BRISQUE 影像品質指標（耗時較長）。
+5. 若無 GPU，啟動時加上 `--cpu` 參數即可在 CPU 上執行：`python app.py --cpu`。
+"""
+
 interface = gr.Interface(
     fn=process_image,
     inputs=[
         gr.Image(label="Low-light Image", type="pil"),
-        gr.Radio(choices=['Yes','No'],label="Image Score",info="Calculate NIQE and BRISQUE, default is \"No\"."),
-        gr.Radio(choices=pth_files2,label="Model Weights",info="Choose your model. The best models are \"SICE.pth\" and \"generalization.pth\"."),
+        gr.Radio(choices=['Yes','No'],label="Image Score",info="Calculate NIQE and BRISQUE, default is \"No\".",value='No'),
+        gr.Radio(choices=pth_files2,label="Model Weights",info="Choose your model. The best models are \"SICE.pth\" and \"generalization.pth\".",value=pth_files2[0] if pth_files2 else None),
         gr.Slider(0.1,5,label="gamma curve",step=0.01,value=1.0, info="Lower is lighter, and best range is [0.5,2.5]."),
         gr.Slider(0,2,label="Alpha-s",step=0.01,value=1.0, info="Higher is more saturated."),
         gr.Slider(0.1,2,label="Alpha-i",step=0.01,value=1.0, info="Higher is lighter.")
@@ -97,7 +111,9 @@ interface = gr.Interface(
         gr.Textbox(label="NIQE",info="Lower is better."),
         gr.Textbox(label="BRISQUE",info="Lower is better.")
     ],
-    title="HVI-CIDNet (Low-Light Image Enhancement)",
+    title=f"HVI-CIDNet (Low-Light Image Enhancement) — {CLAUDE_NOTICE}",
+    description=USAGE_GUIDE,
+    article=f"---\n{CLAUDE_NOTICE}",
     allow_flagging="never"
 )
 
