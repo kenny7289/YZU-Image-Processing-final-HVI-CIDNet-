@@ -164,3 +164,11 @@ output
 weights
 flagged
 output_hf
+
+# Keep our course-project deliverables despite the broad rules above
+!weights/
+!weights/LOLv2_syn/
+weights/LOLv2_syn/*
+!weights/LOLv2_syn/generalization.pth
+!paper/results/
+!paper/results/**
